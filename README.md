@@ -12,7 +12,7 @@ Vibe-Explosion/
 ├─ script.js  
 ├─ README.md  
 └─ images/  
-      └─ mic-permission.png  
+&emsp;└─ mic-permission.png  
   
 - index.html の役割  
 この HTML ファイルは「音に反応するビジュアルエフェクト」を表示するためのシンプルなページです。  
