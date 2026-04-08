@@ -63,11 +63,14 @@ navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
     //   canvas.width * 0.7
     // );
     // 中心をゆらゆら動かす
-    t += 0.02; // ゆらぎ速度
+    t += 0.04; // ゆらぎ速度
 
-    // ゆらゆら揺れる中心位置
-    const cx = canvas.width / 2 + Math.sin(t) * 40;
-    const cy = canvas.height / 2 + Math.cos(t * 0.7) * 40;
+    // ゆらゆら揺れる中心位置（複合波：パターンA）
+    // const cx = canvas.width / 2 + (Math.sin(t) + Math.sin(t * 2) * 0.5) * 100;
+    // const cy = canvas.height / 2 + (Math.cos(t * 0.9) + Math.cos(t * 1.2) * 0.4) * 100;
+    // ゆらゆら揺れる中心位置（複合波：パターンB）
+    const cx = canvas.width / 2 + (Math.sin(t) + Math.sin(t * 2) * 0.5 + Math.sin(t * 3) * 0.2) * 90;
+    const cy = canvas.height / 2 + (Math.cos(t * 0.9) + Math.cos(t * 1.3) * 0.4 + Math.cos(t * 2.1) * 0.15) * 90;
 
     const gradient = ctx.createRadialGradient(
       cx, cy, 80,         // 中心が揺れる
@@ -93,17 +96,22 @@ navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
 
     const radius = 120 + volume * 0.4;
 
-    ctx.strokeStyle = `rgba(200, 120, 255, ${0.3 + volume / 300})`;
+    // 波形の色を音量に応じて変化させる（音量が大きいほど明るく）
+    // ctx.strokeStyle = `rgba(200, 120, 255, ${0.3 + volume / 300})`;
+    ctx.strokeStyle = `rgba(100, 150, 255, ${0.3 + volume / 300})`;
     ctx.lineWidth = 4;
-    // ctx.beginPath();
-    // ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    // ctx.stroke();
-    // 誇張演出:3レイヤ波形
-    for (let i = 0; i < 3; i++) {
-      const waveRadius = 120 + i * 25 + volume * (0.3 + i * 0.2);
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    // 誇張演出:5レイヤ波形
+    for (let i = 0; i < 5; i++) {
+      // 波形の半径を外側に広げる
+      const waveRadius = 140 + i * 30 + volume * (0.3 + i * 0.2);
 
-      ctx.strokeStyle = `rgba(220, 180, 255, ${0.15 + i * 0.1})`;
-      ctx.lineWidth = 2 + i;
+      // 波形の色もレイヤーごとに変化させる（外側ほど淡く）
+      // ctx.strokeStyle = `rgba(100, 150, 255, ${0.15 + i * 0.1})`;
+      ctx.strokeStyle = `rgba(100, 150, 255, ${0.2 + volume / 500 + i * 0.5})`;
+      ctx.lineWidth = 1 + i * 0.5;
 
       ctx.beginPath();
       ctx.arc(cx, cy, waveRadius, 0, Math.PI * 2);
@@ -118,10 +126,15 @@ navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
 
     // ギザギザの円の大きさを外側に広げる
     // const baseRadius = 80 + volume * 0.3;
-    const baseRadius = 150 + volume * 0.9; // ギザギザ円の半径を強化
+    const baseRadius = 120 + volume * 0.9; // ギザギザ円の半径を強化
     const spikes = 60;
     
-    ctx.fillStyle = `hsl(${50 + volume * 0.6}, 100%, 60%)`;
+    // 無音で黄色、音量MAXで緑
+    // ctx.fillStyle = `hsl(${50 + volume * 0.6}, 100%, 60%)`;
+    // 無音で緑
+    // 音量最大時は、今の 0.6 の係数でおおよそ hue≈40（黄〜橙(爆発の色をより暖色寄りにシフト)）
+    // 中心円の hue を 120 から 90 に下げて、音量0時の緑を少し黄色寄りにシフト
+    ctx.fillStyle = `hsl(${90 - volume * 0.6}, 100%, 60%)`;
 
     ctx.beginPath();
     for (let i = 0; i < spikes; i++) {
