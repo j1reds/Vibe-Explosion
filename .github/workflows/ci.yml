@@ -1,0 +1,22 @@
+name: Minimal CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check files exist
+        run: |
+          test -f index.html
+          test -f script.js
+
+      - name: CI finished
+        run: echo "CI completed successfully"
