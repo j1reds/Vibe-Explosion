@@ -15,9 +15,8 @@ jobs:
 
       - name: Check files exist
         run: |
-          exit 1
-          // test -f index.html
-          // test -f script.js
+          test -f index.html
+          test -f script.js
           
       - name: CI finished
         run: echo "CI completed successfully"
