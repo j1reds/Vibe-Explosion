@@ -1,5 +1,6 @@
 const canvas = document.getElementById("canvas"); // Canvas
-const ctx = canvas.getContext("2d") // Canvasの描画コンテキスト
+const ctx = canvas.getContext("2d"); // Canvasの描画コンテキスト
+const x = ; // CI syntax　error situation test
 
 canvas.width = window.innerWidth; // Canvasを画面全体に広げる
 canvas.height = window.innerHeight; // Canvasを画面全体に広げる
