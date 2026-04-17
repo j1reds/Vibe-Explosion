@@ -2,8 +2,11 @@ name: Minimal CI
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - '**'
+  pull_request:
+    paths:
+      - '**'
 
 jobs:
   check:
@@ -17,9 +20,37 @@ jobs:
         run: |
           test -f index.html
           test -f script.js
+          test -f README.md
+          test -d images
+          test "$(ls -A images)"
 
-      - name: Check JavaScript syntax
-        run: node -c script.js
+      - name: Detect code changes
+        id: changes
+        run: |
+          # イベントごとに比較対象を切り替える
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }}
+            BASE_REF=origin/${{ github.base_ref }}
+          else
+            BASE_REF=HEAD~1
+          fi
+
+          echo "Compare base is: $BASE_REF"
+
+          CHANGED_FILES=$(git diff --name-only $BASE_REF...HEAD)
+          echo "$CHANGED_FILES"
+
+          if echo "$CHANGED_FILES" | grep -E '(script.js|index.html)'; then
+            echo "code_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "code_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check HTML and JavaScript syntax
+        if: steps.changes.outputs.code_changed == 'true'
+        run: |
+          node -c index.html
+          node -c script.js
 
       - name: CI finished
         run: echo "CI completed successfully"
