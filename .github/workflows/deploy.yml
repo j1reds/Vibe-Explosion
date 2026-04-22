@@ -1,0 +1,37 @@
+name: Deploy to GitHub Pages
+# Phase1: CI 成功条件を入れずに、CD 単体を成功させる
+# Phase2: CI 成功時のみ CD が走るようにする(jobsのneeds: check有効化)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # job 間依存（needs）は「同じ workflow 内」でしか使えないので一旦コメントアウト
+    # needs: check   # ← CI job 名（ci.yml の jobs.check）
+    # if: needs.check.result == 'success'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+
