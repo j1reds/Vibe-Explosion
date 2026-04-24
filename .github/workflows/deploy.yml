@@ -1,11 +1,13 @@
 name: Deploy to GitHub Pages
 # Phase1: CI 成功条件を入れずに、CD 単体を成功させる
 # Phase2: CI 成功時のみ CD が走るようにする(jobsのneeds: check有効化)
+#         ただしCIとCDが同一ワークフローの場合に needs は使用可能
+# Phase3: CI workflow 完了後に CD を実行（workflow_run）
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["CI"]          # ci.yml の name
+    types: [completed]
 
 permissions:
   contents: read
@@ -15,9 +17,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # job 間依存（needs）は「同じ workflow 内」でしか使えないので一旦コメントアウト
-    # needs: check   # ← CI job 名（ci.yml の jobs.check）
-    # if: needs.check.result == 'success'
+    # CI が成功した場合のみ deploy
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout repository
@@ -33,5 +34,3 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-
-

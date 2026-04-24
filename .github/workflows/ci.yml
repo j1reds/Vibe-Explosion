@@ -1,21 +1,16 @@
-name: Minimal CI
+name: CI
 
 on:
   push:
-    paths:
-      - '**'
+    branches: [main]
   pull_request:
-    paths:
-      - '**'
 
 jobs:
   check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
         with:
           fetch-depth: 2
 
@@ -49,11 +44,17 @@ jobs:
             echo "code_changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Check HTML and JavaScript syntax
-        if: steps.changes.outputs.code_changed == 'true'
-        run: |
-          node -c index.html
-          node -c script.js
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check JavaScript syntax
+        run: node -c script.js
+
+      - name: Install HTMLHint
+        run: npm install --global htmlhint
+
+      - name: Check HTML syntax
+        run: htmlhint index.html
 
       - name: CI finished
         run: echo "CI completed successfully"
