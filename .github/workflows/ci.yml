@@ -21,6 +21,8 @@ jobs:
           test -f README.md
           test -d images
           test "$(ls -A images)"
+          test -d .github/workflows
+          test "$(ls -A .github/workflows)"
 
       - name: Detect code changes
         id: changes
